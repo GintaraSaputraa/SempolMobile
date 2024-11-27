@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { Component, useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import {Text, View, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions, Image, Button} from 'react-native';
+import {Text, View, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions, Image, Button,Platform} from 'react-native';
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import * as SplashScreen from 'expo-splash-screen';
@@ -10,6 +10,12 @@ import Modal from 'react-native-modal';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Page, Font } from 'react-native-pdf-lib';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import { PDFDocument, rgb } from 'pdf-lib';
+import XLSX from 'xlsx';
+
 
 const { height, width } = Dimensions.get('window');
 // Mencegah splash screen hilang otomatis
@@ -117,7 +123,7 @@ export default function App({ navigation }) {
 
   const fetchData = async () => {
     try {
-        const response = await axios.get('http://192.168.28.215/MyMobileProjectReal/sempolAPI/getDataDashboard.php');
+        const response = await axios.get('http://192.168.100.73/SempolMobile/sempolAPI/getDataDashboard.php');
         
         if (response.data && response.data.success === true) {
             setDataDashboard(response.data.data);
@@ -211,7 +217,7 @@ const handleSubmit = () => {
 };
 
   // Contoh POST ke API
-  fetch('http://192.168.28.215/MyMobileProjectReal/sempolAPI/insertDataBaru.php', {
+  fetch(' ', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -327,24 +333,181 @@ const handleSubmit = () => {
   const showEndDatepicker = () => {
     setShowEndDatePicker(true);
   };
-  const handleExport = () => {
-    Alert.alert(
-      "Pilih Format Ekspor",
-      "Pilih format yang ingin Anda ekspor",
-      [
-        {
-          text: "PDF",
-          onPress: handlePdfExport,
-        },
-        {
-          text: "Excel",
-          onPress: handleExcelExport,
-        },
-        { text: "Batal", style: "cancel" },
-      ],
-      { cancelable: true }
-    );
-  };
+
+// // Fungsi untuk meminta izin akses media
+// const requestPermissions = async () => {
+//   const { status } = await MediaLibrary.requestPermissionsAsync();
+//   if (status === 'granted') {
+//     console.log('Izin akses media diberikan!');
+//     return true;  // Izin diberikan
+//   } else {
+//     console.log('Izin akses media ditolak');
+//     return false; // Izin ditolak
+//   }
+// };
+
+// const createPdf = async () => {
+//   console.log('Membuat PDF...');
+
+//   try {
+//     // Meminta izin untuk akses media
+//     const hasPermission = await requestPermissions();
+//     if (!hasPermission) {
+//       console.log('Tidak ada izin untuk membuat PDF.');
+//       return;
+//     }
+
+//     // Membuat dokumen PDF menggunakan pdf-lib
+//     const doc = await PDFDocument.create();
+//     const page = doc.addPage([300, 500]); // Ukuran halaman
+//     const { width, height } = page.getSize();
+
+//     // Menggunakan font standar Helvetica
+//     const font = await doc.embedStandardFont('Helvetica');
+//     page.drawText('Hello, this is your PDF!', {
+//       x: 50,
+//       y: height - 100,
+//       font,
+//       size: 24,
+//       color: rgb(0, 0, 0),
+//     });
+
+//     // Menyimpan file PDF dalam format Base64
+//     const pdfBytes = await doc.save();
+//     const pdfBase64 = pdfBytes.toString('base64'); // Mengonversi PDF ke Base64
+
+//     // Menyimpan file PDF ke sistem file menggunakan expo-file-system
+//     const pdfPath = `${FileSystem.documentDirectory}example.pdf`;
+//     await FileSystem.writeAsStringAsync(pdfPath, pdfBase64, {
+//       encoding: FileSystem.EncodingType.Base64,
+//     });
+
+//     console.log('PDF saved at:', pdfPath);
+//   } catch (error) {
+//     console.error('Error creating PDF:', error);
+//   }
+// };
+  
+// Fungsi untuk meminta izin akses media
+const requestPermissions = async () => {
+  const { status } = await MediaLibrary.requestPermissionsAsync();
+  if (status === 'granted') {
+    console.log('Izin akses media diberikan!');
+    return true;  // Izin diberikan
+  } else {
+    console.log('Izin akses media ditolak');
+    return false; // Izin ditolak
+  }
+};
+
+// Fungsi untuk membuat PDF dan menyalinnya ke folder Downloads
+const createPdf = async () => {
+  console.log('Membuat PDF...');
+
+  try {
+    // Meminta izin untuk akses media
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      console.log('Tidak ada izin untuk membuat PDF.');
+      return;
+    }
+
+    // Membuat dokumen PDF
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([300, 500]); // Ukuran halaman
+    const { width, height } = page.getSize();
+
+    // Menggunakan font standar Helvetica
+    const font = await doc.embedStandardFont('Helvetica');
+    page.drawText('Hello, this is your PDF!', {
+      x: 50,
+      y: height - 100,
+      font,
+      size: 24,
+      color: rgb(0, 0, 0),
+    });
+
+    // Menyimpan file PDF dalam format biner
+    const pdfBytes = await doc.save();
+
+    // Mengonversi PDF ke format Base64
+    const pdfBase64 = pdfBytes.toString('base64');
+
+    // Menyimpan file PDF ke direktori aplikasi
+    const pdfPath = `${FileSystem.documentDirectory}example.pdf`;
+
+    // Menyimpan sebagai Base64
+    await FileSystem.writeAsStringAsync(pdfPath, pdfBase64, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    console.log('PDF saved at:', pdfPath);
+
+    // Menyalin file ke folder Downloads
+    const downloadPath = `${FileSystem.documentDirectory}../Download/example.pdf`;  // Path Downloads
+
+    // Menyalin file PDF ke Downloads
+    await FileSystem.copyAsync({ from: pdfPath, to: downloadPath });
+    console.log('PDF copied to Downloads at:', downloadPath);
+
+  } catch (error) {
+    console.error('Error creating PDF:', error);
+  }
+};
+// Fungsi untuk membuat Excel
+const createExcel = async () => {
+  console.log('Membuat Excel...');
+
+  try {
+    // Meminta izin untuk akses media (hanya sekali)
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      console.log('Tidak ada izin untuk membuat Excel.');
+      return;
+    }
+
+    // Data untuk file Excel
+    const data = [
+      ['Nama', 'Umur', 'Kota'],
+      ['John Doe', 28, 'Bandung'],
+      ['Jane Smith', 22, 'Jakarta'],
+      ['Alice Johnson', 30, 'Surabaya'],
+    ];
+
+    // Membuat worksheet dan workbook dari data
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    // Menyimpan file Excel
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    // Menyimpan file Excel dalam format Base64
+    const excelBase64 = wbout.toString('base64');
+    const excelPath = `${FileSystem.documentDirectory}example.xlsx`;
+
+    await FileSystem.writeAsStringAsync(excelPath, excelBase64, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    console.log('Excel saved at:', excelPath);
+
+  } catch (error) {
+    console.error('Error creating Excel:', error);
+  }
+};
+
+// Fungsi untuk membuat PDF atau Excel tergantung aksi pengguna
+const createDocument = async (type) => {
+  if (type === 'pdf') {
+    await createPdf();  // Buat PDF
+  } else if (type === 'excel') {
+    await createExcel();  // Buat Excel
+  } else {
+    console.log('Jenis dokumen tidak valid');
+  }
+};
+
+
 
   useEffect(() => {
     const today = new Date();
@@ -1467,11 +1630,11 @@ const handleSubmit = () => {
                               {showEndDatePicker && (<DateTimePicker value={endDate} mode="date" display="default" onChange={onChangeEndDate} />)}
 
                               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                <TouchableOpacity onPress={handleExport} style={{ alignItems: 'center', borderWidth: 0.5, borderColor: '#afaeae', borderRadius: 10, padding: 10, flex: 1, marginRight: 5 }}>
+                                <TouchableOpacity onPress={createPdf} style={{ alignItems: 'center', borderWidth: 0.5, borderColor: '#afaeae', borderRadius: 10, padding: 10, flex: 1, marginRight: 5 }}>
                                   <Icon name="file-pdf-o" size={20} color="#000" />
                                 </TouchableOpacity>
                                 
-                                <TouchableOpacity onPress={handleExport} style={{ alignItems: 'center', borderWidth: 0.5, borderColor: '#afaeae', borderRadius: 10, padding: 10, flex: 1, marginLeft: 5 }}>
+                                <TouchableOpacity onPress={createExcel} style={{ alignItems: 'center', borderWidth: 0.5, borderColor: '#afaeae', borderRadius: 10, padding: 10, flex: 1, marginLeft: 5 }}>
                                   <Icon name="file-excel-o" size={20} color="#000" />
                                 </TouchableOpacity>
                               </View> 
