@@ -468,11 +468,46 @@ const createExcel = async () => {
 
     // Data untuk file Excel
     const data = [
-      ['Nama', 'Umur', 'Kota'],
-      ['John Doe', 28, 'Bandung'],
-      ['Jane Smith', 22, 'Jakarta'],
-      ['Alice Johnson', 30, 'Surabaya'],
+      // Tanggal
+      ['Tanggal', '01/10/2024', '02/10/2024', '03/10/2024', '04/10/2024', '05/10/2024', '06/10/2024', '07/10/2024', '08/10/2024', '09/10/2024', '10/10/2024'],
+    
+      // Stock Awal
+      ['Stock Awal', '10', '15', '13', '12', '20', '18', '22', '16', '14', '17'],
+    
+      // Stock Akhir
+      ['Stock Akhir', '8', '12', '10', '11', '19', '17', '21', '15', '13', '16'],
+    
+      // BS
+      ['BS', '6', '10', '8', '9', '18', '16', '20', '14', '12', '15'],
+    
+      // Bonus
+      ['Bonus', '2', '3', '4', '3', '4', '3', '5', '3', '2', '4'],
+    
+      // Terjual
+      ['Terjual', 'O', 'J', 'H', 'K', 'MP', 'Usus', 'Kikil', 'Moza', '0', '15'],
+      
+      // Total Terjual
+      ['Total Terjual', '20', '30', '25', '22', '35', '30', '40', '28', '25', '32'],
+    
+      // Total Harga Diskon
+      ['Total Harga Diskon', 'Rp. 100,000', 'Rp. 200,000', 'Rp. 150,000', 'Rp. 170,000', 'Rp. 250,000', 'Rp. 230,000', 'Rp. 280,000', 'Rp. 210,000', 'Rp. 220,000', 'Rp. 260,000'],
+    
+      // Pendapatan Kotor
+      ['Pendapatan Kotor', 'Real', 'Target', 'Rp. 150,000', 'Rp. 200,000', 'Rp. 160,000', 'Rp. 180,000', 'Rp. 250,000', 'Rp. 240,000', 'Rp. 300,000', 'Rp. 230,000'],
+    
+      // Pengeluaran SDM
+      ['Pengeluaran SDM', 'Gaji', 'Bensin', 'Bonus', 'Lain-lain', 'Rp. 100,000', 'Rp. 50,000', 'Rp. 30,000', 'Rp. 10,000', 'Rp. 20,000', 'Rp. 40,000'],
+    
+      // Pengeluaran Operasional
+      ['Pengeluaran Operasional', 'Gas', 'Iuran', 'Lain-lain', 'Rp. 40,000', 'Rp. 20,000', 'Rp. 15,000', 'Rp. 25,000', 'Rp. 18,000', 'Rp. 22,000'],
+    
+      // Total Pengeluaran
+      ['Total Pengeluaran', 'Rp. 150,000', 'Rp. 120,000', 'Rp. 100,000', 'Rp. 110,000', 'Rp. 140,000', 'Rp. 125,000', 'Rp. 160,000', 'Rp. 130,000', 'Rp. 115,000'],
+    
+      // Pendapatan Bersih
+      ['Pendapatan Bersih', 'QRIS', 'GoFood', 'Cash', 'Total', 'Rp. 50,000', 'Rp. 70,000', 'Rp. 30,000', 'Rp. 45,000', 'Rp. 65,000']
     ];
+    
 
     // Membuat worksheet dan workbook dari data
     const ws = XLSX.utils.aoa_to_sheet(data);
